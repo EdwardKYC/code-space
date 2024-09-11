@@ -9,7 +9,7 @@ int main() {
         break;
     case '-':
         printf("%d\n" , a-b)
-        break;20*300
+        break;
     case '*':
         printf("%d\n" , a*b)
         break;
