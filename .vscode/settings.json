@@ -1,5 +1,14 @@
 {
     "files.associations": {
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "array": "c",
+        "bitset": "c",
+        "initializer_list": "c",
+        "regex": "c",
+        "utility": "c",
+        "valarray": "c",
+        "e.C": "cpp",
+        "tempCodeRunnerFile.C": "cpp",
+        "string": "cpp"
     }
 }
