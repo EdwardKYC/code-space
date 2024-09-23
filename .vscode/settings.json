@@ -9,6 +9,7 @@
         "valarray": "c",
         "e.C": "cpp",
         "tempCodeRunnerFile.C": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "iostream": "cpp"
     }
 }
