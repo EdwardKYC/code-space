@@ -12,7 +12,7 @@ int main() {
         cin >> songs[i];
     }
 
-    unordered_set<int> playlist; 
+    set<int> playlist; 
     int left = 0, max_len = 0;
 
     for (int right = 0; right < n; right++) {
