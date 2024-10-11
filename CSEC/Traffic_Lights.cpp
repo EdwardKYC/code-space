@@ -1,5 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
+
 int main() {
     int x, n;
     cin >> x >> n;
@@ -9,6 +10,7 @@ int main() {
     
     multiset<int> without;
     without.insert(x);
+
     for (int i = 0; i < n; i++) {
         int p;
         cin >> p;
