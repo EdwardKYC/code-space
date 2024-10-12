@@ -1,2 +1,0 @@
-
-    list<int> children;
