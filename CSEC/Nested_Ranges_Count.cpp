@@ -7,48 +7,88 @@ struct range
 {
     int x , y , idx;
 };
+int lowbit(int x) {
+    return x & (-x);
+}
 bool cmp(range a , range b) {
     if (a.x == b.x) return a.y > b.y;
     return a.x < b.x;
 }
+class BIT {
+    vector<int> bit;
+    int n;
+
+public:
+    BIT(int size) {
+        n = size;
+        bit.resize(n + 1, 0); // 初始化大小為 n+1
+    }
+
+    void update(int idx, int delta) {
+        while (idx <= n) {
+            bit[idx] += delta;
+            idx += lowbit(idx); // 向上更新
+        }
+    }
+
+    int query(int idx) {
+        int sum = 0;
+        while (idx > 0) {
+            sum += bit[idx];
+            idx -= lowbit(idx); // 向前查詢
+        }
+        return sum;
+    }
+
+    // 查詢大於等於 y 的數量
+    int greater_query(int y) {
+        return query(n) - query(y - 1);
+    }
+};
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
+
     int n;
     cin >> n;
+
     vector<range> v(n);
-    for(int i = 0 ; i < n ; i++) {
+    vector<int> arr_y(n);
+
+    for(int i = 0; i < n; i++) {
         cin >> v[i].x >> v[i].y;
         v[i].idx = i;
+        arr_y[i] = v[i].y;
     }
-    sort(v.begin() , v.end() , cmp);
-    vector<int> a1(n , 0);
-    vector<int> a2(n , 0);
-    int maxy = 0;
-    for (int i = 0; i < n; i++) {//被包含
-        
-        int tempy = maxy;
-        for (int tempi = i; tempi >= 0; tempi--) {
-            if (v[i].y <= tempy) a1[v[i].idx]++;
-            tempy = v[tempi].y;
-        }
-        maxy = max(maxy , v[i].y);
+
+    sort(arr_y.begin(), arr_y.end());
+    sort(v.begin(), v.end(), cmp);
+
+    BIT bit(n);
+    for (int i = 0; i < n; i++) {
+        bit.update(i + 1, 1); // 假設你要對索引 i+1 更新值
     }
-    int miny = INT32_MAX;
-    for (int i = n - 1; i >= 0; i--) {//包含
-        int tempy = miny;
-        for (int tempi = i; tempi < n; tempi++) {
-            if (v[i].y >= tempy) a2[v[i].idx]++;
-            tempy = v[tempi].y;
-        }
-        miny = min(miny, v[i].y);
+
+    vector<int> a1(n, 0);
+    vector<int> a2(n, 0);
+
+    for (int i = 0; i < n; i++) { // 被包含
+        a1[i] = bit.greater_query(v[i].y);
     }
+
+    for (int i = n - 1; i >= 0; i--) { // 包含
+        a2[i] = bit.greater_query(v[i].y);
+    }
+
     for (int i = 0; i < n; i++) {
         cout << a2[i] << " ";
     }
     cout << '\n';
+
     for (int i = 0; i < n; i++) {
         cout << a1[i] << " ";
     }
+
     return 0;
 }
