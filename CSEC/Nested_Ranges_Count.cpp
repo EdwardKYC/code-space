@@ -24,24 +24,11 @@ int main() {
     sort(v.begin() , v.end() , cmp);
     vector<int> a1(n , 0);
     vector<int> a2(n , 0);
-    int maxy = 0;
     for (int i = 0; i < n; i++) {//被包含
         
-        int tempy = maxy;
-        for (int tempi = i; tempi >= 0; tempi--) {
-            if (v[i].y <= tempy) a1[v[i].idx]++;
-            tempy = v[tempi].y;
-        }
-        maxy = max(maxy , v[i].y);
     }
-    int miny = INT32_MAX;
     for (int i = n - 1; i >= 0; i--) {//包含
-        int tempy = miny;
-        for (int tempi = i; tempi < n; tempi++) {
-            if (v[i].y >= tempy) a2[v[i].idx]++;
-            tempy = v[tempi].y;
-        }
-        miny = min(miny, v[i].y);
+        
     }
     for (int i = 0; i < n; i++) {
         cout << a2[i] << " ";
