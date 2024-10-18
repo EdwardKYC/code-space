@@ -32,7 +32,8 @@ void find(stack *k) {
         pop(k);
     }
     if (k->c[k->top] == '-'||k->c[k->top] == '+'){
-        if (k->c[k->top-1] == '*' || k->c[k->top-1] == '*'){
+        if (k->c[k->top - 1] == '*' || k->c[k->top - 1] == '/' || k->c[k->top - 1] == '+' || k->c[k->top - 1] == '-')
+        {
             char c = k->c[k->top];
             erace(k);
             while (k->top >= 0)
@@ -41,8 +42,15 @@ void find(stack *k) {
             }
             insert(k , c);
         }
-        else {
+    }
+    if (k->c[k->top] == '*' || k->c[k->top] == '/')
+    {
+        if (k->c[k->top - 1] == '*' || k->c[k->top - 1] == '/')
+        {
+            char c = k->c[k->top];
+            erace(k);
             pop(k);
+            insert(k, c);
         }
     }
 }
