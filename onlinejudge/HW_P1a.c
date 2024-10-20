@@ -15,14 +15,16 @@ void insert(stack *k , char s) {
     k -> c[++(k->top)] = s;
 }
 void pop(stack *k){
-    ans->c[++(ans->top)] = k->c[(k->top)];
-    k->top--;
+    if (k->top >= 0) {
+        ans->c[++(ans->top)] = k->c[(k->top)];
+        k->top--;
+    }
+    
 }
 void find(stack *k) {
     if (k->c[k->top] != '+'&&k->c[k->top] != '-'&&k->c[k->top] != '*'&&k->c[k->top] != '/'){
         pop(k);
         pop(k);
-        
     }
 }
 
