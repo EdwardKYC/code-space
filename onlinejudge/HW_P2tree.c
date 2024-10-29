@@ -92,7 +92,10 @@ void delete(heap *hp , int a) {
         return;
     }
     if (del == last) {
-        del->data = -1;
+        if (last->farther != NULL) {
+            if (last->farther->left == last) last->farther->left = NULL;
+            else if (last->farther->right == last) last->farther->right = NULL;
+        }
         free(last);
         return;
     }
@@ -101,8 +104,8 @@ void delete(heap *hp , int a) {
         if (last->farther->left == last) last->farther->left = NULL;
         else if (last->farther->right == last) last->farther->right = NULL;
     }
-    if (del != NULL) downfind(del);
-    if (last != NULL) free(last);
+    downfind(del);
+    free(last);
 }
 void ans(heap *hp) {
     heap *queue[1000];
