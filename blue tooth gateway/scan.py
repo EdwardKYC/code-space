@@ -1,19 +1,34 @@
+from bluepy import btle
 import time
-import schedule
-import requests
+import paho.mqtt.client as mqtt
+from datetime import datetime
 
-def scan_bluetooth():
-    try:
+mqtt_broker = "172.22.105.97"  # §ÚªºMQTT¦øªA¾¹¦a§}
+mqtt_port = 1883
+mqtt_topic = "bluetooth/data"
 
-        response = requests.get("http://your-rigado-gateway-ip/api/scan") 
-        if response.status_code == 200:
-            print("æƒææˆåŠŸ")
-            print(response.json()) 
-    except Exception as e:
-        print(f"æƒææ™‚ç™¼ç”ŸéŒ¯èª¤: {e}")
+client = mqtt.Client()
+client.connect(mqtt_broker, mqtt_port, 60)
 
-schedule.every(10).seconds.do(scan_bluetooth)
+class ScanDelegate(btle.DefaultDelegate):
+    def __init__(self):
+        btle.DefaultDelegate.__init__(self)
+
+    def handleDiscovery(self, dev, isNewDev, isNewData):
+        if isNewDev:
+            print(f"Discovered device {dev.addr}, RSSI={dev.rssi} dB")
+            publish_data(dev.addr, dev.rssi)
+
+def publish_data(address, rssi):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    payload = {"address": address, "rssi": rssi, "timestamp": timestamp}
+    client.publish(mqtt_topic, str(payload))
+    print(f"Published data: {payload}")
+
+def scan_devices():
+    scanner = btle.Scanner().withDelegate(ScanDelegate())
+    devices = scanner.scan(10.0)  # ±½´y10¬í
 
 while True:
-    schedule.run_pending()
-    time.sleep(1)
+    scan_devices()
+    time.sleep(10)  # ¨C¹j10¬í±½´y¤@¦¸
