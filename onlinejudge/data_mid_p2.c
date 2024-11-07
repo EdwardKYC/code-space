@@ -2,45 +2,134 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-typedef struct stack
-{
-    int top;
-    int data[100000];
-}stack;
-stack s;
+typedef struct max_heap heap;
 
-int pop() {
-    if (s.top > 0) return s.data[--s.top];
-    return -1;
+struct max_heap {
+    int data;
+    heap *left;
+    heap *right;
+    heap *parent;
+};
+heap* creatnode(int data) {
+    heap *newnode = (heap *)malloc(sizeof(heap));
+    newnode->data = data;
+    newnode->left = NULL;
+    newnode->right = NULL;
+    newnode->parent = NULL;
+    return newnode;
 }
-void intput(int n) {
-    s.data[s.top++] = n;
+void swap(int *a , int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }
-bool push(char c[100]) {
-    if (c[0] >= '0' && c[0] <= '9'){
-        s.data[s.top++] = atoi(c);
+void upfind(heap *node) {
+    heap *current = node;
+    while (current->parent != NULL) {
+        if (current->data > current->parent->data) {
+            swap(&current->data , &current->parent->data);
+            current = current->parent;
+        }  
+        else break;
     }
-    else {
-        int y = pop() , x = pop(); 
-        if (x == -1 || y == -1) return false;
-
-        if (strcmp(c, "+") == 0) intput(x+y);
-        else if (strcmp(c, "-") == 0) intput(x-y);
-        else if (strcmp(c, "*") == 0) intput(x*y);
-        else if (strcmp(c, "/") == 0) intput(x/y);
+}
+heap* insert(heap *node , int data) {
+    if (node == NULL) return creatnode(data);
+    int f = 0 , r = 0;
+    heap **queue = (heap **) malloc(1000*sizeof(heap *)) ;
+    queue[r++] = node;
+    while (r > f) {
+        heap *newnode = queue[f++];
+        if (newnode->left == NULL) {
+            newnode->left = creatnode(data);
+            newnode->left->parent = newnode;
+            upfind(newnode->left);
+            break;
+        }
+        else if (newnode->right == NULL) {
+            newnode->right = creatnode(data);
+            newnode->right->parent = newnode;
+            upfind(newnode->right);
+            break;
+        }
+        else {
+            queue[r++] = newnode->left;
+            queue[r++] = newnode->right;
+        }
     }
-    return true;
+    free(queue);
+    return node;
+}
+void downfind(heap *node) {
+    heap *current = node;
+    while (current->left != NULL || current->right != NULL) {
+        if ((current->left != NULL && current->right != NULL) &&current->left->data > current->data && current->right->data > current->data) {
+            current = (current->left->data > current->right->data)? current->left : current->right;
+            swap(&current->data , &current->parent->data);
+        }
+        else if (current->left != NULL && current->left->data > current->data) {
+            swap(&current->data , &current->left->data);
+            current = current->left;
+        }
+        else if (current->right != NULL && current->right->data > current->data) {
+            swap(&current->data , &current->right->data);
+            current = current->right;
+        }
+        else{
+            break;
+        }
+        
+    }
+}
+heap* delete(heap *node , int data) {
+    int f = 0 , r = 0;
+    heap **queue = (heap **) malloc(1000*sizeof(heap *)) ;
+    queue[r++] = node;
+    while (r > f) {
+        heap *newnode = queue[f++];
+        if (newnode->left != NULL) queue[r++] = newnode->left;
+        if (newnode->right != NULL) queue[r++] = newnode->right; 
+    }
+    heap *dnode = queue[--r];
+    node->data = dnode->data;
+    if (dnode->parent != NULL) {
+        if (dnode->parent->left == dnode) {
+            dnode->parent->left = NULL;
+        } else if (dnode->parent->right == dnode) {
+            dnode->parent->right = NULL;
+        }
+    }
+    free(dnode);
+    downfind(node);
+    free(queue);
+    return node;
+}
+void print(heap *node) {
+    int f = 0 , r = 0;
+    heap **queue = (heap **) malloc(1000*sizeof(heap *)) ;
+    queue[r++] = node;
+    while (r > f) {
+        heap *newnode = queue[f++];
+        printf("%d " , newnode->data);
+        if (newnode->left != NULL) queue[r++] = newnode->left;
+        if (newnode->right != NULL) queue[r++] = newnode->right; 
+    }
+    free(queue);
 }
 int main() {
-    s.top = 0;
-    char c[100];
-    bool f;
-    while (scanf("%s" , c) != EOF) {
-        f = push(c);
-        if (!f)break;
+    char option[10];
+    int data;
+    heap *root = NULL;
+    
+    while (scanf("%s" , option) != EOF) {
+        scanf("%d" , &data);
+        if (strcmp(option , "insert") == 0) {
+            root = insert(root , data);
+        }
+        if (strcmp(option , "delete") == 0) {
+            root = delete(root , data);
+        }
     }
-    int ans = pop();
-    if (s.top != 0 || !f) printf("Invalid");
-    else printf("%d" , ans);   
+    print(root);
     return 0;
 }
