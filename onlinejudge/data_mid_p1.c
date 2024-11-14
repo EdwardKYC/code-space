@@ -40,7 +40,8 @@ int main() {
         f = push(c);
         if (!f)break;
     }
-    int ans = pop();
+    int ans = pop();        
+    
     if (s.top != 0 || !f) printf("Invalid");
     else printf("%d" , ans);   
     return 0;
