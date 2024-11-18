@@ -1,37 +1,69 @@
 # -*- coding: utf-8 -*-
-
 import asyncio
-import time
 from bleak import BleakScanner
 import paho.mqtt.client as mqtt
+import requests
 from datetime import datetime
+import json
 
-# MQTT �]�m
-mqtt_broker = "172.22.105.97"
+# MQTT 配置
+mqtt_broker = "172.22.105.97"  # 我的 MQTT Broker 地址
 mqtt_port = 1883
 mqtt_topic = "bluetooth/data"
 
-# ��l�� MQTT �Ȥ��
+# API Gateway 配置
+API_URL = "https://<your-api-gateway-id>.execute-api.<region>.amazonaws.com/<stage>"  # 替換為你的 API Gateway URL
+
+# 初始化 MQTT 客戶端
 client = mqtt.Client()
 client.connect(mqtt_broker, mqtt_port, 60)
 
-# �o���ƾڨ� MQTT
-def publish_data(address, rssi):
+# 發布數據到 MQTT
+def publish_to_mqtt(name, address, rssi):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    payload = {"address": address, "rssi": rssi, "timestamp": timestamp}
-    client.publish(mqtt_topic, str(payload))
-    print(f"Published data: {payload}")
+    payload = {
+        "name": name if name else "Unknown",  # 如果名稱為空，填入 "Unknown"
+        "address": address,
+        "rssi": rssi,
+        "timestamp": timestamp
+    }
+    json_payload = json.dumps(payload)
+    client.publish(mqtt_topic, json_payload)
+    print(f"[MQTT] Published: {json_payload}")
 
-# ���y�õo�e�ƾ�
+# 發送數據到 API Gateway
+def send_to_api(name, address, rssi):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    payload = {
+        "name": name if name else "Unknown",  # 如果名稱為空，填入 "Unknown"
+        "address": address,
+        "rssi": rssi,
+        "timestamp": timestamp
+    }
+    try:
+        response = requests.post(API_URL, json=payload)
+        print(f"[API] Sent: {payload}")
+        print(f"[API] Response: {response.status_code}, {response.text}")
+    except Exception as e:
+        print(f"[API] Error: {e}")
+
+# 掃描藍牙裝置並傳遞數據
 async def scan_devices():
     while True:
-        print("�}�l���y�˸m...")
+        print("開始掃描藍牙裝置...")
         devices = await BleakScanner.discover()
         for device in devices:
-            print(f"�o�{�˸m {device.address}, RSSI={device.rssi} dB")
-            publish_data(device.address, device.rssi)
-        print("���y�����A���� 10 ��...")
-        await asyncio.sleep(10)  # �C 10 �����y�@��
+            name = device.name  # 獲取裝置名稱
+            print(f"發現裝置: {name if name else 'Unknown'} ({device.address}), RSSI: {device.rssi} dB")
+            # 發送數據到 MQTT 和 API
+            publish_to_mqtt(name, device.address, device.rssi)
+            send_to_api(name, device.address, device.rssi)
+        print("掃描結束，等待 10 秒...")
+        await asyncio.sleep(10)  # 每 10 秒掃描一次
 
-# ���汽�y
-asyncio.run(scan_devices())
+# 主程式入口
+if __name__ == "__main__":
+    try:
+        asyncio.run(scan_devices())
+    except KeyboardInterrupt:
+        print("程序終止。")
