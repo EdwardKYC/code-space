@@ -1,14 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
-#include <windows.h>
+#define ll long long int
 bool check(int data){
     if (data <= 60 && data >= 40) return true;
     return false;
 }
 int main() {
-    SetConsoleOutputCP(CP_UTF8);
     int n;   
     scanf("%d" , &n);
     int a[n];
