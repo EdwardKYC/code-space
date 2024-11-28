@@ -113,11 +113,9 @@ void ans(heap *hp) {
     queue[idx++] = hp;
     while (find < idx) {
         heap *now = queue[find++];
-        assert(now != NULL);
         printf("%d ", now->data);
         if (now->left != NULL) queue[idx++] = now->left;
         if (now->right != NULL) queue[idx++] = now->right;
-
     }
     printf("\n");
 }

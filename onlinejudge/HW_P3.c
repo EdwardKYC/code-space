@@ -6,7 +6,6 @@ int queue[100];
 int i = 0, q_idx = -1;
 void bfs(int star, int n)
 {
-    
     visit[star] = 1;
     queue[++q_idx] = star;
     while (i <= q_idx)
