@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <
 #include <stdbool.h>
 #include <stdlib.h>
 int main() {
@@ -32,8 +33,7 @@ int main() {
                 array[i] = array[i - 1];
             }
             array[bp] = a;
-            }
-            
+            }   
         }
         else if (m == 2) {
             scanf("%d", &p);
