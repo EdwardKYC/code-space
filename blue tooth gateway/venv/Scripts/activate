@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\nked1\OneDrive\桌面\coding\程式庫\code-space\blue tooth gateway\venv"
+VIRTUAL_ENV="C:\Users\KANG_YU_QIAN\OneDrive\桌面\code\code-space\blue tooth gateway\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

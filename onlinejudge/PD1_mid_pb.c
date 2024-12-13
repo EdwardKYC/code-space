@@ -9,7 +9,7 @@ int main() {
     int n , m;
     scanf ("%d %d\n" , &n , &m);
     char t[n];
-    scanf ("%s\n" , t);
+    scanf ("%s " , t);
     int location;
     for (int i = 0; i < n; i++) {
         if (t[i] == 'V')location = i;
@@ -18,7 +18,8 @@ int main() {
     for (int i = 0; i < m; i++) {
         char move;
         int movedistance , temp = location;
-        scanf (" %c %d" , &move , &movedistance);
+        getchar();
+        scanf("%c %d", &move, &movedistance);
         if (move == 'L') temp -= movedistance;
         if (move == 'R') temp += movedistance;
         if (temp >= n || temp < 0) {

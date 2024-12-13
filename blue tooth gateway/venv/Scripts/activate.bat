@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\nked1\OneDrive\桌面\coding\程式庫\code-space\blue tooth gateway\venv
+set VIRTUAL_ENV=C:\Users\KANG_YU_QIAN\OneDrive\桌面\code\code-space\blue tooth gateway\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
