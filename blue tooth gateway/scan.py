@@ -67,3 +67,35 @@ if __name__ == "__main__":
         asyncio.run(scan_devices())
     except KeyboardInterrupt:
         print("程序終止。")
+
+'''
+class DeviceModel:
+    def __init__(self):
+        self.devices = []
+
+    def add_device(self, mac_address, name):
+        self.devices.append({"mac_address": mac_address, "name": name})
+
+    def get_devices(self):
+        return self.devices
+'''
+'''
+from flask import Flask, jsonify, request
+from models import DeviceModel
+
+app = Flask(__name__)
+device_model = DeviceModel()
+
+@app.route("/add_device", methods=["POST"])
+def add_device():
+    data = request.json
+    mac_address = data["mac_address"]
+    name = data["name"]
+    device_model.add_device(mac_address, name)
+    return jsonify({"status": "success", "devices": device_model.get_devices()})
+
+@app.route("/get_devices", methods=["GET"])
+def get_devices():
+    return jsonify(device_model.get_devices())
+
+'''
