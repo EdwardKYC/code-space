@@ -1,1 +1,1 @@
-t[location] = '.';
+e
