@@ -27,7 +27,7 @@ FibNode* insert(FibNode *node, int key) {
     FibNode* newnode = (FibNode*)malloc(sizeof(FibNode));
     *newnode = initnode(key);
 
-    if (node->key == -1) *node = *newnode;
+    if (node->key == -1) *node = *newnode;x
     else {
         newnode->right = node->right;
         newnode->left = node;
