@@ -42,6 +42,16 @@ int compareDegree(const void* a, const void* b) {
     }
     return nodeA->key - nodeB->key;
 }
+void printLevelOrder1(FibNode* node) {
+    if (!node || node->key == -1) return;
+
+    FibNode* current = node;
+    do {
+        printTreeLevel(current);
+        current = current->right;
+    } while (current != node);
+}
+
 void printLevelOrder(FibNode* node) {
     if (!node || node->key == -1) return;
 
@@ -83,11 +93,8 @@ FibNode* insert(FibNode *node, int key) {
         newnode->left = node;
         node->right->left = newnode; 
         node->right = newnode;   
-
-        if (newnode->key < node->key) {
-            node = newnode; 
-        }
     }
+    node = newnode;
     return node;
 }
 FibNode* findNode(FibNode* node, int key) {
@@ -180,6 +187,7 @@ FibNode* consolidation(FibNode* node) {
             }
             
             linkTrees(current, other);
+            
             degreeTable[degree] = NULL;
             degree++;
         }
@@ -220,14 +228,16 @@ FibNode* minrootnode(FibNode* node) {
     return minNode; 
 }
 FibNode* extract_min(FibNode* node) {
-    FibNode* minNode = node;
+    FibNode* minNode = minrootnode(node);
     if (!minNode) return NULL;
     FibNode* current = minNode->child;
+    node = node->right;
     if (current != NULL) {
         do {
             current->parent = NULL;
             current = current->right;
         } while (current != minNode->child);
+        
         FibNode* minLeft = minNode->left;
         FibNode* childLeft = minNode->child->left;
 
@@ -236,18 +246,19 @@ FibNode* extract_min(FibNode* node) {
 
         childLeft->right = minNode->right;
         minNode->right->left = childLeft;
-        node = minrootnode(minNode->child);
+      
         
     } else {
         if (minNode->right == minNode) {
             free(minNode);
             return initnode(-1);
         } else {
-            node = minNode->right;
             minNode->left->right = minNode->right;
             minNode->right->left = minNode->left;
+            
         }
     }
+    //printLevelOrder1(node);
     free(minNode);
     return consolidation(node);
 }
@@ -260,6 +271,8 @@ int main() {
         if (strcmp(command, "exit") == 0) {
             printLevelOrder(node);
             break;
+        } else if (strcmp(command, "print") == 0) {
+            printf("%d\n" , node->key);
         } else if (strcmp(command, "extract-min") == 0) {
             node = extract_min(node);
         } else if (strcmp(command, "insert") == 0) {
