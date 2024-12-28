@@ -18,63 +18,46 @@ void printTreeLevel(FibNode* root) {
     int front = 0, rear = 0;
     queue[rear++] = root;
     while (front < rear) {
-        int size = rear - front;
-        for (int i = 0; i < size; i++) {
-            FibNode* current = queue[front++];
-            printf("%d ", current->key);
+        FibNode* current = queue[front++];
+        printf("%d ", current->key);
+        if (current->child) {
             FibNode* child = current->child;
-            if (child) {
-                FibNode* temp = child;
-                do {
-                    queue[rear++] = temp;
-                    temp = temp->right;
-                } while (temp != child);
-            }
+            do {
+                queue[rear++] = child;
+                child = child->right;
+            } while (child != current->child);
         }
     }
     printf("\n");
 }
-int compareDegree(const void* a, const void* b) {
-    FibNode* nodeA = *(FibNode**)a;
-    FibNode* nodeB = *(FibNode**)b;
-    if (nodeA->degree != nodeB->degree) {
-        return nodeA->degree - nodeB->degree;
-    }
-    return nodeA->key - nodeB->key;
-}
-void printLevelOrder1(FibNode* node) {
-    if (!node || node->key == -1) return;
-
-    FibNode* current = node;
-    do {
-        printTreeLevel(current);
-        current = current->right;
-    } while (current != node);
-}
 
 void printLevelOrder(FibNode* node) {
-    if (!node || node->key == -1) return;
-
     int count = 0;
     FibNode* current = node;
     do {
         count++;
         current = current->right;
     } while (current != node);
-
-    FibNode** rootList = (FibNode**)malloc(count * sizeof(FibNode*));
+    FibNode* rootArray[count];
     current = node;
     for (int i = 0; i < count; i++) {
-        rootList[i] = current;
+        rootArray[i] = current;
         current = current->right;
     }
-    qsort(rootList, count, sizeof(FibNode*), compareDegree);
-    for (int i = 0; i < count; i++) {
-        printTreeLevel(rootList[i]);
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = i + 1; j < count; j++) {
+            if (rootArray[i]->degree > rootArray[j]->degree) {
+                FibNode* temp = rootArray[i];
+                rootArray[i] = rootArray[j];
+                rootArray[j] = temp;
+            }
+        }
     }
-
-    free(rootList);
+    for (int i = 0; i < count; i++) {
+        printTreeLevel(rootArray[i]);
+    }
 }
+
 FibNode* initnode(int key) {
     FibNode* newnode = (FibNode*)malloc(sizeof(FibNode));
     newnode->parent = newnode->child = NULL;
@@ -155,7 +138,34 @@ FibNode* decrease(FibNode* node, int key, int value) {
     }
     return node;
 }
-void linkTrees(FibNode* parent, FibNode* child) {
+int compareNodes(const void *a, const void *b) {
+    FibNode *nodeA = *(FibNode **)a;
+    FibNode *nodeB = *(FibNode **)b;
+    return nodeA->key - nodeB->key;
+}
+void sortChildList(FibNode *parent) {
+    if (!parent || parent->child == NULL) return;
+    int count = 0;
+    FibNode *current = parent->child;
+    do {
+        count++;
+        current = current->right;
+    } while (current != parent->child);
+    FibNode **childArray = (FibNode **)malloc(count * sizeof(FibNode *));
+    current = parent->child;
+    for (int i = 0; i < count; i++) {
+        childArray[i] = current;
+        current = current->right;
+    }
+    qsort(childArray, count, sizeof(FibNode *), compareNodes);
+    for (int i = 0; i < count; i++) {
+        childArray[i]->left = childArray[(i - 1 + count) % count];
+        childArray[i]->right = childArray[(i + 1) % count];
+    }
+    parent->child = childArray[0];
+    free(childArray);
+}
+void linkTrees(FibNode *parent, FibNode *child) {
     child->left->right = child->right;
     child->right->left = child->left;
     child->parent = parent;
@@ -169,39 +179,50 @@ void linkTrees(FibNode* parent, FibNode* child) {
         parent->child->right = child;
     }
     parent->degree++;
-    child->mark = false; 
+    child->mark = false;
+    sortChildList(parent);
 }
-FibNode* consolidation(FibNode* node) {
-    FibNode* degreeTable[64] = {NULL};
-    FibNode* current = node;
-    FibNode* next;
+
+FibNode *consolidation(FibNode *node) {
+    if (node == NULL) return NULL;
+    int rootCount = 0;
+    FibNode *current = node;
     do {
-        next = current->right;
+        rootCount++;
+        current = current->right;
+    } while (current != node);
+    FibNode **rootArray = (FibNode **)malloc(rootCount * sizeof(FibNode *));
+    current = node;
+    for (int i = 0; i < rootCount; i++) {
+        rootArray[i] = current;
+        current = current->right;
+    }
+    qsort(rootArray, rootCount, sizeof(FibNode *), compareNodes);
+    FibNode *degreeTable[64] = {NULL}; 
+    for (int i = 0; i < rootCount; i++) {
+        FibNode *current = rootArray[i];
         int degree = current->degree;
         while (degreeTable[degree] != NULL) {
-            FibNode* other = degreeTable[degree];
+            FibNode *other = degreeTable[degree];
             if (current->key > other->key) {
-                FibNode* temp = current;
+                FibNode *temp = current;
                 current = other;
                 other = temp;
             }
-            
             linkTrees(current, other);
-            
             degreeTable[degree] = NULL;
             degree++;
         }
         degreeTable[degree] = current;
-        current = next;
-    } while (current != node);
-    FibNode* minNode = NULL;
+    }
+    FibNode *minNode = NULL;
     for (int i = 0; i < 64; i++) {
         if (degreeTable[i] != NULL) {
             if (minNode == NULL) {
                 degreeTable[i]->left = degreeTable[i]->right = degreeTable[i];
                 minNode = degreeTable[i];
             } else {
-                FibNode* tail = minNode->left;
+                FibNode *tail = minNode->left;
                 tail->right = degreeTable[i];
                 degreeTable[i]->left = tail;
                 degreeTable[i]->right = minNode;
@@ -213,8 +234,10 @@ FibNode* consolidation(FibNode* node) {
             }
         }
     }
+    free(rootArray);
     return minNode;
 }
+
 FibNode* minrootnode(FibNode* node) {
     FibNode* current = node;
     FibNode* minNode = node; 
@@ -229,9 +252,8 @@ FibNode* minrootnode(FibNode* node) {
 }
 FibNode* extract_min(FibNode* node) {
     FibNode* minNode = minrootnode(node);
-    if (!minNode) return NULL;
     FibNode* current = minNode->child;
-    node = node->right;
+    
     if (current != NULL) {
         do {
             current->parent = NULL;
@@ -246,8 +268,7 @@ FibNode* extract_min(FibNode* node) {
 
         childLeft->right = minNode->right;
         minNode->right->left = childLeft;
-      
-        
+        node = minrootnode(minNode->child);
     } else {
         if (minNode->right == minNode) {
             free(minNode);
@@ -255,14 +276,12 @@ FibNode* extract_min(FibNode* node) {
         } else {
             minNode->left->right = minNode->right;
             minNode->right->left = minNode->left;
-            
+            node = minrootnode(minNode->right);
         }
     }
-    //printLevelOrder1(node);
     free(minNode);
     return consolidation(node);
 }
-
 int main() {
     FibNode* node = initnode(-1); 
     char command[20]; int key, value;

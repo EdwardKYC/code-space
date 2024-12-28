@@ -1,1 +1,1 @@
-printLevelOrder1(node);
+sortChildList
