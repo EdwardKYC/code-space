@@ -3,7 +3,7 @@ import json
 import time
 
 BROKER_ADDRESS = "test.mosquitto.org"
-"
+
 PORT = 1883
 DEVICE = "rasp1"
 TOPIC = DEVICE + "/commands"
