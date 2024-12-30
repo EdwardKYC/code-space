@@ -9,10 +9,10 @@ DEVICE = "rasp1"
 TOPIC = DEVICE + "/commands"
 
 COMMAND_CATEGORIES = {
-    "cancel_rasp_navigation": "raspberry_pi_navigation",
-    "cancel_device_navigation": "device_navigation",
-    "add_rasp_direction": "raspberry_pi_direction",
-    "add_device_color": "device_color"
+    "cancel_rasp_navigation": "cancel_rasp_navigation",
+    "cancel_device_navigation": "cancel_device_navigation",
+    "add_rasp_direction": "add_rasp_direction",
+    "add_device_color": "add_device_color"
 }
 
 # 當接收到訊息時的回調函數
@@ -30,20 +30,20 @@ def on_message(client, userdata, message):
         print("[Error] 無法解析收到的 JSON 資料")
 
 def handle_command(category, payload):
-    """ 根據指令類別進行處理 """
-    if category == "raspberry_pi_navigation":
-        print(f"處理 Raspberry Pi 導航取消指令: {payload}")
+    if category == "cancel_rasp_navigation":
+        user_name = payload.get("userName")
+        print(f"取消 {user_name} 的方向指引")
 
-    elif category == "device_navigation":
+    elif category == "cancel_device_navigation":
         user_name = payload.get("userName")
         print(f"取消 {user_name} 的導航指令")
 
-    elif category == "raspberry_pi_direction":
+    elif category == "add_rasp_direction":
         direction = payload.get("direction")
         user_name = payload.get("userName")
         print(f"為 {user_name} 新增 Raspberry Pi 導航方向指令: {direction}")
 
-    elif category == "device_color":
+    elif category == "add_device_color":
         device_id = payload.get("deviceId")
         color = payload.get("color")
         print(f"為裝置 {device_id} 新增顏色: {color}")
