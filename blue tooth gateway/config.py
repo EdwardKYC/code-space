@@ -1,3 +1,5 @@
+import tkinter as tk
+
 connected_devices = {}
 
 class Device:

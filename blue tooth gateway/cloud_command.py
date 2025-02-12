@@ -1,14 +1,8 @@
 from nrf_command import send_message_to_ble_device
 from config import connected_devices
-def cancel_rasp_navigation():
-    1
-def cancel_device_navigation(device_id , color):
-    """
-    根據 device_name 查找 connected_devices 中的 MAC 地址，並傳送顏色訊息。
 
-    :param device_name: 裝置的名稱
-    :param color: 要設置的顏色
-    """
+def cancel_device_navigation(device_id , color):
+
     device = next((dev for dev in connected_devices.values() if dev.name == device_id), None)
     if device:
         mac_address = device.mac
@@ -18,8 +12,6 @@ def cancel_device_navigation(device_id , color):
     else:
         print(f"[ERROR] 裝置名稱 {device_id} 不存在於 connected_devices 中。")
 
-def add_rasp_direction():
-    1
 def add_device_color(device_id , color):
     device = next((dev for dev in connected_devices.values() if dev.name == device_id), None)
     if device:
