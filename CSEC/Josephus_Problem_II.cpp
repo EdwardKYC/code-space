@@ -46,11 +46,11 @@ int main() {
     cin >> n >> k;
     build(1, 1, n);
 
-    int curr = 0; 
+    int cur = 0; 
 
     for (int i = n; i >= 1; i--) {
-        curr = (curr + k) % i;
-        int pos = query(1, 1, n, curr + 1);
+        cur = (cur + k) % i;
+        int pos = query(1, 1, n, cur + 1);
         cout << pos << " ";
         update(1, 1, n, pos); 
     }
