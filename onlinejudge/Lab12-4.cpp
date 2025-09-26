@@ -6,7 +6,6 @@ const long long mod = 1000000007;
 long long** matMul(long long**, long long**, long long);
 long long** fastMatMul(long long**, long long, long long);
 void rlsMem(long long**, int);
-
 int main() {
     long long** A = new long long*[3];
     for (int i = 0; i < 3; i++) {
